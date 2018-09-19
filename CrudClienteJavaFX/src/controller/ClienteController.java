@@ -91,9 +91,9 @@ public class ClienteController implements Initializable {
 		
 		if (lista == null || lista.isEmpty()) {
 			Alert alerta = new Alert(AlertType.INFORMATION);
-			alerta.setTitle("InformaÁ„o:");
+			alerta.setTitle("Informa√ß√£o:");
 			alerta.setHeaderText(null);
-			alerta.setContentText("A consulta n„o retornou dados!");
+			alerta.setContentText("A consulta n√£o retornou dados!");
 			alerta.show();
 			lista = new ArrayList<>();
 		}
@@ -104,9 +104,9 @@ public class ClienteController implements Initializable {
 	@FXML
 	void handleOnMouseClicked(MouseEvent event) {
 		
-		//VERIFICANDO SE … O BOT√O PRINCIPAL QUE FOI CLIADO
+		//VERIFICANDO SE √â O BOT√ÉO PRINCIPAL QUE FOI CLIADO
 		if (event.getButton().equals(MouseButton.PRIMARY)) {
-			//VERIFICANDO SE A QUANTIDADE DE CLIQUES NO BOT√O PRIM¡RIO … IGUAL A 2
+			//VERIFICANDO SE A QUANTIDADE DE CLIQUES NO BOT√ÉO PRIM√ÅRIO √â IGUAL A 2
 			if (event.getClickCount() == 2) {
 
 				cliente = tvClientes.getSelectionModel().getSelectedItem();
@@ -137,7 +137,7 @@ public class ClienteController implements Initializable {
 
 		EntityManager em = JPAFactory.getEntityManager();
 
-		// Iniciando a transaÁ„o
+		// Iniciando a transa√ß√£o
 		em.getTransaction().begin();
 		em.merge(cliente);
 		em.getTransaction().commit();
@@ -150,24 +150,25 @@ public class ClienteController implements Initializable {
 	void handleExcluir(ActionEvent event) {
 		EntityManager em = JPAFactory.getEntityManager();
 		
-			Alert alert = new Alert(AlertType.CONFIRMATION);
-			alert.setTitle("ConfirmaÁ„o");
-			alert.setHeaderText("Est· operaÁ„o excluir· todas as informaÁıes selecionadas da base de dados.");
-			alert.setContentText("Deseja realmente excluir?");
-			//Capturar as resposta do usu·rio sobre a mensagem de confirmaÁ„o
-			Optional<ButtonType> resposta = alert.showAndWait();
-			if(resposta.get().equals(ButtonType.OK)) {
-				// Iniciando a transaÁ„o
-				em.getTransaction().begin();
-				cliente = em.merge(cliente);
-				em.remove(cliente);
-				em.getTransaction().commit();
-				em.close();
+		//MENSAGEM DE ALERTA PARA O USU√ÅRIO CONFIRMAR UMA EXCLUS√ÉO
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("Confirma√ß√£o");
+		alert.setHeaderText("Est√° opera√ß√£o excluir√° todas as informa√ß√µes selecionadas da base de dados.");
+		alert.setContentText("Deseja realmente excluir?");
+		//Capturar as resposta do usu√°rio sobre a mensagem de confirma√ß√£o
+		Optional<ButtonType> resposta = alert.showAndWait();
+		if(resposta.get().equals(ButtonType.OK)) {
+			// Iniciando a transa√ß√£o
+			em.getTransaction().begin();
+			cliente = em.merge(cliente);
+			em.remove(cliente);
+			em.getTransaction().commit();
+			em.close();
 				
-				handleLimpar(event);
-			}else if(resposta.get().equals(ButtonType.CANCEL)) {
+			handleLimpar(event);
+		}else if(resposta.get().equals(ButtonType.CANCEL)) {
 				
-			}
+		}
 	}
 
 	@FXML
@@ -176,7 +177,7 @@ public class ClienteController implements Initializable {
 
 		EntityManager em = JPAFactory.getEntityManager();
 
-		// Iniciando a transaÁ„o
+		// Iniciando a transa√ß√£o
 		em.getTransaction().begin();
 		em.persist(cliente);
 		em.getTransaction().commit();
@@ -192,7 +193,7 @@ public class ClienteController implements Initializable {
 		tfEmail.setText("");
 		tfEndereco.setText("");
 		
-		//LIMPANDO AS INFORMA«’ES DO CLIENTE
+		//LIMPANDO AS INFORMA√á√ïES DO CLIENTE
 		cliente = new Cliente();
 		
 		tfNome.requestFocus();
