@@ -3,6 +3,7 @@ package controller;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javax.persistence.EntityManager;
@@ -20,6 +21,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -147,15 +149,25 @@ public class ClienteController implements Initializable {
 	@FXML
 	void handleExcluir(ActionEvent event) {
 		EntityManager em = JPAFactory.getEntityManager();
-
-		// Iniciando a transação
-		em.getTransaction().begin();
-		cliente = em.merge(cliente);
-		em.remove(cliente);
-		em.getTransaction().commit();
-		em.close();
 		
-		handleLimpar(event);
+			Alert alert = new Alert(AlertType.CONFIRMATION);
+			alert.setTitle("Confirmação");
+			alert.setHeaderText("Está operação excluirá todas as informações selecionadas da base de dados.");
+			alert.setContentText("Deseja realmente excluir?");
+			//Capturar as resposta do usuário sobre a mensagem de confirmação
+			Optional<ButtonType> resposta = alert.showAndWait();
+			if(resposta.get().equals(ButtonType.OK)) {
+				// Iniciando a transação
+				em.getTransaction().begin();
+				cliente = em.merge(cliente);
+				em.remove(cliente);
+				em.getTransaction().commit();
+				em.close();
+				
+				handleLimpar(event);
+			}else if(resposta.get().equals(ButtonType.CANCEL)) {
+				
+			}
 	}
 
 	@FXML
