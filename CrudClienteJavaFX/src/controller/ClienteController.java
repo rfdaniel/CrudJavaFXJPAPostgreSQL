@@ -1,6 +1,7 @@
 package controller;
 
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +23,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -40,6 +42,9 @@ public class ClienteController implements Initializable {
 
 	@FXML
 	private TextField tfNome, tfCpf, tfEndereco, tfEmail;
+	
+    @FXML
+    private DatePicker dpAniversario;
 
 	@FXML
 	private Button btLimpar, btIncluir, btExcluir, btAlterar;
@@ -61,6 +66,9 @@ public class ClienteController implements Initializable {
 
 	@FXML
 	private TableColumn<Cliente, String> tcEmailCliente;
+	
+    @FXML
+    private TableColumn<Cliente, LocalDate> tcAniversarioCliente;
 
 	@FXML
 	private TextField tfPesquisar;
@@ -76,6 +84,7 @@ public class ClienteController implements Initializable {
 		tcNomeCliente.setCellValueFactory(new PropertyValueFactory<>("nome"));
 		tcEnderecoCliente.setCellValueFactory(new PropertyValueFactory<>("endereco"));
 		tcEmailCliente.setCellValueFactory(new PropertyValueFactory<>("email"));
+		tcAniversarioCliente.setCellValueFactory(new PropertyValueFactory<>("dataaniversario"));
 	}
 
 	@FXML
@@ -104,9 +113,9 @@ public class ClienteController implements Initializable {
 	@FXML
 	void handleOnMouseClicked(MouseEvent event) {
 		
-		//VERIFICANDO SE É O BOTÃO PRINCIPAL QUE FOI CLIADO
+		//VERIFICANDO SE Ã‰ O BOTÃƒO PRINCIPAL QUE FOI CLIADO
 		if (event.getButton().equals(MouseButton.PRIMARY)) {
-			//VERIFICANDO SE A QUANTIDADE DE CLIQUES NO BOTÃO PRIMÁRIO É IGUAL A 2
+			//VERIFICANDO SE A QUANTIDADE DE CLIQUES NO BOTÃƒO PRIMÃ�RIO Ã‰ IGUAL A 2
 			if (event.getClickCount() == 2) {
 
 				cliente = tvClientes.getSelectionModel().getSelectedItem();
@@ -115,6 +124,7 @@ public class ClienteController implements Initializable {
 				tfNome.setText(cliente.getNome());
 				tfEndereco.setText(cliente.getEndereco());
 				tfEmail.setText(cliente.getEmail());
+				dpAniversario.setValue(cliente.getDataAniversario());
 
 				// SELECIONANDO A PRIMEIRA ABA
 				tpAbas.getSelectionModel().select(0);
@@ -134,10 +144,11 @@ public class ClienteController implements Initializable {
 		cliente.setNome(tfNome.getText());
 		cliente.setEndereco(tfEndereco.getText());
 		cliente.setEmail(tfEmail.getText());
+		cliente.setDataAniversario(dpAniversario.getValue());
 
 		EntityManager em = JPAFactory.getEntityManager();
 
-		// Iniciando a transação
+		// Iniciando a transaÃ§Ã£o
 		em.getTransaction().begin();
 		em.merge(cliente);
 		em.getTransaction().commit();
@@ -150,15 +161,15 @@ public class ClienteController implements Initializable {
 	void handleExcluir(ActionEvent event) {
 		EntityManager em = JPAFactory.getEntityManager();
 		
-		//MENSAGEM DE ALERTA PARA O USUÁRIO CONFIRMAR UMA EXCLUSÃO
+		//MENSAGEM DE ALERTA PARA O USUÃ�RIO CONFIRMAR UMA EXCLUSÃƒO
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Confirmação");
 		alert.setHeaderText("Está operação excluirá todas as informações selecionadas da base de dados.");
 		alert.setContentText("Deseja realmente excluir?");
-		//Capturar as resposta do usuário sobre a mensagem de confirmação
+		//Capturar as resposta do usuÃ¡rio sobre a mensagem de confirmaÃ§Ã£o
 		Optional<ButtonType> resposta = alert.showAndWait();
 		if(resposta.get().equals(ButtonType.OK)) {
-			// Iniciando a transação
+			// Iniciando a transaÃ§Ã£o
 			em.getTransaction().begin();
 			cliente = em.merge(cliente);
 			em.remove(cliente);
@@ -173,11 +184,11 @@ public class ClienteController implements Initializable {
 
 	@FXML
 	void handleIncluir(ActionEvent event) {
-		cliente = new Cliente(tfCpf.getText(), tfNome.getText(), tfEndereco.getText(), tfEmail.getText());
+		cliente = new Cliente(tfCpf.getText(), tfNome.getText(), tfEndereco.getText(), tfEmail.getText(), dpAniversario.getValue());
 
 		EntityManager em = JPAFactory.getEntityManager();
 
-		// Iniciando a transação
+		// Iniciando a transaÃ§Ã£o
 		em.getTransaction().begin();
 		em.persist(cliente);
 		em.getTransaction().commit();
@@ -192,8 +203,9 @@ public class ClienteController implements Initializable {
 		tfNome.setText("");
 		tfEmail.setText("");
 		tfEndereco.setText("");
+		dpAniversario.setValue(null);
 		
-		//LIMPANDO AS INFORMAÇÕES DO CLIENTE
+		//LIMPANDO AS INFORMAÃ‡Ã•ES DO CLIENTE
 		cliente = new Cliente();
 		
 		tfNome.requestFocus();

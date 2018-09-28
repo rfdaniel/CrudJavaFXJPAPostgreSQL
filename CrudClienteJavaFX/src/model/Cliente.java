@@ -1,7 +1,9 @@
 package model;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -23,16 +25,20 @@ public class Cliente implements Serializable{
 	private String endereco;
 	private String email;
 	
+	@Column(columnDefinition="Date")
+	private LocalDate dataAniversario;
+	
 	public Cliente() {
 		
 	}
 	
-	public Cliente(String cpf, String nome, String endereco, String email) {
+	public Cliente(String cpf, String nome, String endereco, String email, LocalDate dataAniversario) {
 		super();
 		this.cpf = cpf;
 		this.nome = nome;
 		this.endereco = endereco;
 		this.email = email;
+		this.dataAniversario = dataAniversario;
 	}
 
 	public Integer getId() {
@@ -73,5 +79,13 @@ public class Cliente implements Serializable{
 	
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	
+	public LocalDate getDataAniversario() {
+		return dataAniversario;
+	}
+
+	public void setDataAniversario(LocalDate dataAniversario) {
+		this.dataAniversario = dataAniversario;
 	}
 }
