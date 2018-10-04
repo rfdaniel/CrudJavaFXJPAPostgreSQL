@@ -90,22 +90,15 @@ public class ClienteController implements Initializable {
 
 	@FXML
 	void handlePesquisar(ActionEvent event) {
-		System.out.println("Pesquisar");
-
-		EntityManager em = JPAFactory.getEntityManager();
-		//List<Cliente> lista = em.createQuery("SELECT c FROM Cliente c").getResultList();
-
-		Query query = em.createQuery("SELECT c FROM Cliente c WHERE lower(c.nome) like lower(:nome)");
-		query.setParameter("nome", "%" + tfPesquisar.getText() + "%");
-		List<Cliente> lista = query.getResultList();
+		ClienteRepository repository = new ClienteRepository(JPAFactory.getEntityManager());
+		List<Cliente> lista = repository.getClientes(tfPesquisar.getText());
 		
-		if (lista == null || lista.isEmpty()) {
+		if (lista.isEmpty()) {
 			Alert alerta = new Alert(AlertType.INFORMATION);
 			alerta.setTitle("Informação:");
 			alerta.setHeaderText(null);
 			alerta.setContentText("A consulta não retornou dados!");
 			alerta.show();
-			lista = new ArrayList<>();
 		}
 
 		tvClientes.setItems(FXCollections.observableList(lista));
@@ -159,7 +152,8 @@ public class ClienteController implements Initializable {
 
 	@FXML
 	void handleExcluir(ActionEvent event) {
-		EntityManager em = JPAFactory.getEntityManager();
+		
+		ClienteRepository repository = new ClienteRepository(JPAFactory.getEntityManager());
 		
 		//MENSAGEM DE ALERTA PARA O USUÃ�RIO CONFIRMAR UMA EXCLUSÃƒO
 		Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -169,13 +163,13 @@ public class ClienteController implements Initializable {
 		//Capturar as resposta do usuÃ¡rio sobre a mensagem de confirmaÃ§Ã£o
 		Optional<ButtonType> resposta = alert.showAndWait();
 		if(resposta.get().equals(ButtonType.OK)) {
+		
 			// Iniciando a transaÃ§Ã£o
-			em.getTransaction().begin();
-			cliente = em.merge(cliente);
-			em.remove(cliente);
-			em.getTransaction().commit();
-			em.close();
-				
+			repository.getEntityManager().getTransaction().begin();
+			repository.remove(cliente);
+			repository.getEntityManager().getTransaction().commit();
+			repository.getEntityManager().close();
+			
 			handleLimpar(event);
 		}else if(resposta.get().equals(ButtonType.CANCEL)) {
 				
