@@ -32,6 +32,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import model.Cliente;
+import repository.ClienteRepository;
 
 public class ClienteController implements Initializable {
 
@@ -68,7 +69,7 @@ public class ClienteController implements Initializable {
 	private TableColumn<Cliente, String> tcEmailCliente;
 	
     @FXML
-    private TableColumn<Cliente, LocalDate> tcAniversarioCliente;
+    private TableColumn<Cliente, LocalDate> dataAniversario;
 
 	@FXML
 	private TextField tfPesquisar;
@@ -84,7 +85,7 @@ public class ClienteController implements Initializable {
 		tcNomeCliente.setCellValueFactory(new PropertyValueFactory<>("nome"));
 		tcEnderecoCliente.setCellValueFactory(new PropertyValueFactory<>("endereco"));
 		tcEmailCliente.setCellValueFactory(new PropertyValueFactory<>("email"));
-		tcAniversarioCliente.setCellValueFactory(new PropertyValueFactory<>("dataaniversario"));
+		dataAniversario.setCellValueFactory(new PropertyValueFactory<>("dataAniversario"));
 	}
 
 	@FXML
@@ -146,13 +147,12 @@ public class ClienteController implements Initializable {
 		cliente.setEmail(tfEmail.getText());
 		cliente.setDataAniversario(dpAniversario.getValue());
 
-		EntityManager em = JPAFactory.getEntityManager();
-
-		// Iniciando a transaÃ§Ã£o
-		em.getTransaction().begin();
-		em.merge(cliente);
-		em.getTransaction().commit();
-		em.close();
+		ClienteRepository repository = new ClienteRepository(JPAFactory.getEntityManager());
+		
+		repository.getEntityManager().getTransaction().begin();
+		repository.save(cliente);
+		repository.getEntityManager().getTransaction().commit();
+		repository.getEntityManager().close();
 		
 		handleLimpar(event);
 	}
@@ -186,13 +186,13 @@ public class ClienteController implements Initializable {
 	void handleIncluir(ActionEvent event) {
 		cliente = new Cliente(tfCpf.getText(), tfNome.getText(), tfEndereco.getText(), tfEmail.getText(), dpAniversario.getValue());
 
-		EntityManager em = JPAFactory.getEntityManager();
-
-		// Iniciando a transaÃ§Ã£o
-		em.getTransaction().begin();
-		em.persist(cliente);
-		em.getTransaction().commit();
-		em.close();
+		ClienteRepository repository = new ClienteRepository(JPAFactory.getEntityManager());
+		
+		// Iniciando a transação
+		repository.getEntityManager().getTransaction().begin();
+		repository.save(cliente);
+		repository.getEntityManager().getTransaction().commit();
+		repository.getEntityManager().close();
 		
 		handleLimpar(event);
 	}

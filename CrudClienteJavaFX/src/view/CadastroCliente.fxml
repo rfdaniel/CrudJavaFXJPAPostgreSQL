@@ -51,7 +51,7 @@
                               <TableColumn fx:id="tcNomeCliente" editable="false" prefWidth="89.0" text="Nome" />
                               <TableColumn fx:id="tcEnderecoCliente" editable="false" prefWidth="124.0" text="Endereço" />
                               <TableColumn fx:id="tcEmailCliente" editable="false" prefWidth="124.0" text="Email" />
-                              <TableColumn fx:id="tcAniversarioCliente" prefWidth="100.0" text="Aniversário" />
+                              <TableColumn fx:id="dataAniversario" prefWidth="100.0" text="Aniversário" />
                           </columns>
                         </TableView>
                      </children>
