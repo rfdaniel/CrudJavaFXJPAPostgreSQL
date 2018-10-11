@@ -9,31 +9,12 @@ import javax.persistence.Query;
 import factory.JPAFactory;
 import model.Cliente;
 
-public class ClienteRepository {
+public class ClienteRepository extends Repository<Cliente> {
 
-	private EntityManager entityManager;
-	
 	public ClienteRepository(EntityManager entityManager) {
-		this.entityManager = entityManager;
-	}
-	
-	public EntityManager getEntityManager() {
-		return entityManager;
+		super(entityManager);
 	}
 
-	public void setEntityManager(EntityManager entityManager) {
-		this.entityManager = entityManager;
-	}
-
-	public Cliente save(Cliente cliente) {
-		return getEntityManager().merge(cliente);
-	}
-	
-	public void remove(Cliente cliente) {
-		cliente = getEntityManager().merge(cliente);
-		getEntityManager().remove(cliente);
-	}
-	
 	public List<Cliente> getClientes(String nome){
 		Query query = getEntityManager().createQuery("SELECT c FROM Cliente c WHERE lower(c.nome) like lower(:nome)");
 		query.setParameter("nome", "%" + nome + "%");

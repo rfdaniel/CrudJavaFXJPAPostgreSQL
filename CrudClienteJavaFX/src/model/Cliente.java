@@ -2,32 +2,29 @@ package model;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Persistence;
+import javax.persistence.OneToMany;
 
 @Entity
-public class Cliente implements Serializable{
+public class Cliente extends DefaultEntity<Cliente>{
 
 	private static final long serialVersionUID = 371369774565415403L;
-
-	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private Integer Id;
+	
 	private String cpf;
 	private String nome;
 	private String endereco;
 	private String email;
 	
+	@OneToMany(cascade=CascadeType.ALL)
+	private List<Telefone> listaTelefone;
+
 	@Column(columnDefinition="Date")
 	private LocalDate dataAniversario;
-	
+
 	public Cliente() {
 		
 	}
@@ -39,14 +36,6 @@ public class Cliente implements Serializable{
 		this.endereco = endereco;
 		this.email = email;
 		this.dataAniversario = dataAniversario;
-	}
-
-	public Integer getId() {
-		return Id;
-	}
-	
-	public void setId(Integer id) {
-		Id = id;
 	}
 	
 	public String getCpf() {
@@ -87,5 +76,13 @@ public class Cliente implements Serializable{
 
 	public void setDataAniversario(LocalDate dataAniversario) {
 		this.dataAniversario = dataAniversario;
+	}
+	
+	public List<Telefone> getListaTelefone() {
+		return listaTelefone;
+	}
+
+	public void setListaTelefone(List<Telefone> listaTelefone) {
+		this.listaTelefone = listaTelefone;
 	}
 }

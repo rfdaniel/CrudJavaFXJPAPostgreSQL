@@ -32,20 +32,22 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import model.Cliente;
+import model.Telefone;
 import repository.ClienteRepository;
 
-public class ClienteController implements Initializable {
+public class ClienteController extends Controller implements Initializable {
 
 	private Cliente cliente;
+	private Telefone telefone;
 
 	@FXML
 	private TabPane tpAbas;
 
 	@FXML
 	private TextField tfNome, tfCpf, tfEndereco, tfEmail;
-	
-    @FXML
-    private DatePicker dpAniversario;
+
+	@FXML
+	private DatePicker dpAniversario;
 
 	@FXML
 	private Button btLimpar, btIncluir, btExcluir, btAlterar;
@@ -67,9 +69,18 @@ public class ClienteController implements Initializable {
 
 	@FXML
 	private TableColumn<Cliente, String> tcEmailCliente;
+
+	@FXML
+	private TableColumn<Cliente, LocalDate> dataAniversario;
 	
     @FXML
-    private TableColumn<Cliente, LocalDate> dataAniversario;
+    private TextField tfDdd;
+
+    @FXML
+    private TextField tfNumeroTelefone;
+
+    @FXML
+    private Button btIncluirTelefone;
 
 	@FXML
 	private TextField tfPesquisar;
@@ -92,7 +103,7 @@ public class ClienteController implements Initializable {
 	void handlePesquisar(ActionEvent event) {
 		ClienteRepository repository = new ClienteRepository(JPAFactory.getEntityManager());
 		List<Cliente> lista = repository.getClientes(tfPesquisar.getText());
-		
+
 		if (lista.isEmpty()) {
 			Alert alerta = new Alert(AlertType.INFORMATION);
 			alerta.setTitle("Informação:");
@@ -106,10 +117,10 @@ public class ClienteController implements Initializable {
 
 	@FXML
 	void handleOnMouseClicked(MouseEvent event) {
-		
-		//VERIFICANDO SE Ã‰ O BOTÃƒO PRINCIPAL QUE FOI CLIADO
+
+		// VERIFICANDO SE Ã‰ O BOTÃƒO PRINCIPAL QUE FOI CLIADO
 		if (event.getButton().equals(MouseButton.PRIMARY)) {
-			//VERIFICANDO SE A QUANTIDADE DE CLIQUES NO BOTÃƒO PRIMÃ�RIO Ã‰ IGUAL A 2
+			// VERIFICANDO SE A QUANTIDADE DE CLIQUES NO BOTÃƒO PRIMÃ�RIO Ã‰ IGUAL A 2
 			if (event.getClickCount() == 2) {
 
 				cliente = tvClientes.getSelectionModel().getSelectedItem();
@@ -125,7 +136,7 @@ public class ClienteController implements Initializable {
 
 				// SETANDO O FOCUS NO NOME
 				tfNome.requestFocus();
-				
+
 				atualizarBotoes();
 			}
 		}
@@ -133,61 +144,43 @@ public class ClienteController implements Initializable {
 
 	@FXML
 	void handleAlterar(ActionEvent event) {
-		
+
 		cliente.setCpf(tfCpf.getText());
 		cliente.setNome(tfNome.getText());
 		cliente.setEndereco(tfEndereco.getText());
 		cliente.setEmail(tfEmail.getText());
 		cliente.setDataAniversario(dpAniversario.getValue());
 
-		ClienteRepository repository = new ClienteRepository(JPAFactory.getEntityManager());
-		
-		repository.getEntityManager().getTransaction().begin();
-		repository.save(cliente);
-		repository.getEntityManager().getTransaction().commit();
-		repository.getEntityManager().close();
-		
+		super.save(cliente);
+
 		handleLimpar(event);
 	}
 
 	@FXML
 	void handleExcluir(ActionEvent event) {
-		
-		ClienteRepository repository = new ClienteRepository(JPAFactory.getEntityManager());
-		
-		//MENSAGEM DE ALERTA PARA O USUÃ�RIO CONFIRMAR UMA EXCLUSÃƒO
+
+		// MENSAGEM DE ALERTA PARA O USUÃ�RIO CONFIRMAR UMA EXCLUSÃƒO
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Confirmação");
 		alert.setHeaderText("Está operação excluirá todas as informações selecionadas da base de dados.");
 		alert.setContentText("Deseja realmente excluir?");
-		//Capturar as resposta do usuÃ¡rio sobre a mensagem de confirmaÃ§Ã£o
+		// Capturar as resposta do usuÃ¡rio sobre a mensagem de confirmaÃ§Ã£o
 		Optional<ButtonType> resposta = alert.showAndWait();
-		if(resposta.get().equals(ButtonType.OK)) {
-		
-			// Iniciando a transaÃ§Ã£o
-			repository.getEntityManager().getTransaction().begin();
-			repository.remove(cliente);
-			repository.getEntityManager().getTransaction().commit();
-			repository.getEntityManager().close();
-			
+		if (resposta.get().equals(ButtonType.OK)) {
+			super.remove(cliente);
 			handleLimpar(event);
-		}else if(resposta.get().equals(ButtonType.CANCEL)) {
-				
+		} else if (resposta.get().equals(ButtonType.CANCEL)) {
+
 		}
 	}
 
 	@FXML
 	void handleIncluir(ActionEvent event) {
-		cliente = new Cliente(tfCpf.getText(), tfNome.getText(), tfEndereco.getText(), tfEmail.getText(), dpAniversario.getValue());
+		cliente = new Cliente(tfCpf.getText(), tfNome.getText(), tfEndereco.getText(), tfEmail.getText(),
+				dpAniversario.getValue());
 
-		ClienteRepository repository = new ClienteRepository(JPAFactory.getEntityManager());
-		
-		// Iniciando a transação
-		repository.getEntityManager().getTransaction().begin();
-		repository.save(cliente);
-		repository.getEntityManager().getTransaction().commit();
-		repository.getEntityManager().close();
-		
+		super.save(cliente);
+
 		handleLimpar(event);
 	}
 
@@ -198,15 +191,15 @@ public class ClienteController implements Initializable {
 		tfEmail.setText("");
 		tfEndereco.setText("");
 		dpAniversario.setValue(null);
-		
-		//LIMPANDO AS INFORMAÃ‡Ã•ES DO CLIENTE
+
+		// LIMPANDO AS INFORMAÃ‡Ã•ES DO CLIENTE
 		cliente = new Cliente();
-		
+
 		tfNome.requestFocus();
-		
+
 		atualizarBotoes();
 	}
-	
+
 	private void atualizarBotoes() {
 		btIncluir.setDisable(cliente.getId() != null);
 		btAlterar.setDisable(cliente.getId() == null);
