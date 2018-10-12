@@ -8,8 +8,6 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.TreeTableColumn?>
-<?import javafx.scene.control.TreeTableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
@@ -39,13 +37,13 @@
                         <TextField fx:id="tfDdd" layoutX="126.0" layoutY="239.0" prefHeight="25.0" prefWidth="150.0" />
                         <Label alignment="CENTER_RIGHT" layoutX="61.0" layoutY="281.0" prefHeight="27.0" prefWidth="57.0" text="Telefone:" />
                         <TextField fx:id="tfNumeroTelefone" layoutX="126.0" layoutY="282.0" />
-                        <Button fx:id="btIncluirTelefone" layoutX="126.0" layoutY="325.0" mnemonicParsing="false" onAction="#handleIncluir" prefHeight="25.0" prefWidth="149.0" text="Incluir" />
-                        <TreeTableView layoutX="303.0" layoutY="239.0" prefHeight="111.0" prefWidth="275.0">
+                        <Button fx:id="btAdicionarTelefone" layoutX="126.0" layoutY="325.0" mnemonicParsing="false" onAction="#handleAdicionarTelefone" prefHeight="25.0" prefWidth="149.0" text="Adicionar" />
+                        <TableView fx:id="tbTelefone" layoutX="293.0" layoutY="195.0" prefHeight="155.0" prefWidth="285.0">
                           <columns>
-                            <TreeTableColumn fx:id="tcDdd" prefWidth="75.0" text="DDD" />
-                            <TreeTableColumn fx:id="tcNumeroTelefone" prefWidth="199.0" text="Telefone" />
+                            <TableColumn fx:id="tcDdd" prefWidth="85.0" text="DDD" />
+                            <TableColumn fx:id="tcTelefone" prefWidth="199.0" text="Telefone" />
                           </columns>
-                        </TreeTableView>
+                        </TableView>
                      </children>
                   </AnchorPane>
             </content>

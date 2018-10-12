@@ -35,10 +35,9 @@ import model.Cliente;
 import model.Telefone;
 import repository.ClienteRepository;
 
-public class ClienteController extends Controller implements Initializable {
+public class ClienteController extends Controller<Cliente> implements Initializable {
 
 	private Cliente cliente;
-	private Telefone telefone;
 
 	@FXML
 	private TabPane tpAbas;
@@ -82,6 +81,15 @@ public class ClienteController extends Controller implements Initializable {
     @FXML
     private Button btIncluirTelefone;
 
+    @FXML
+    private TableView<Telefone> tbTelefone;
+
+    @FXML
+    private TableColumn<Telefone, String> tcDdd;
+
+    @FXML
+    private TableColumn<Telefone, String> tcTelefone;
+    
 	@FXML
 	private TextField tfPesquisar;
 
@@ -97,7 +105,33 @@ public class ClienteController extends Controller implements Initializable {
 		tcEnderecoCliente.setCellValueFactory(new PropertyValueFactory<>("endereco"));
 		tcEmailCliente.setCellValueFactory(new PropertyValueFactory<>("email"));
 		dataAniversario.setCellValueFactory(new PropertyValueFactory<>("dataAniversario"));
+		
+		// CONFIGURANDO AS COLUNAS DAS TABELAS CONFORME OS ATRIBUTOS DA CLASSE TELEFONE
+		tcDdd.setCellValueFactory(new PropertyValueFactory<>("codigoArea"));
+		tcTelefone.setCellValueFactory(new PropertyValueFactory<>("numero"));
+		
+		//ATUALIZAR BOTÕES
+		atualizarBotoes();
 	}
+	
+    @FXML
+    void handleAdicionarTelefone(ActionEvent event) {
+    	Telefone telefone = new Telefone();
+    	telefone.setCodigoArea(tfDdd.getText());
+    	telefone.setNumero(tfNumeroTelefone.getText());
+    	telefone.setCliente(cliente);
+    	
+    	if(getCliente().getListaTelefone() == null)
+    		getCliente().setListaTelefone(new ArrayList<Telefone>());
+    	
+    	getCliente().getListaTelefone().add(telefone);
+    	
+    	tbTelefone.setItems(FXCollections.observableList(getCliente().getListaTelefone()));
+    	
+    	tfDdd.clear();
+    	tfNumeroTelefone.clear();
+    	tfDdd.requestFocus();
+    }
 
 	@FXML
 	void handlePesquisar(ActionEvent event) {
@@ -125,11 +159,14 @@ public class ClienteController extends Controller implements Initializable {
 
 				cliente = tvClientes.getSelectionModel().getSelectedItem();
 
-				tfCpf.setText(cliente.getCpf());
-				tfNome.setText(cliente.getNome());
-				tfEndereco.setText(cliente.getEndereco());
-				tfEmail.setText(cliente.getEmail());
-				dpAniversario.setValue(cliente.getDataAniversario());
+				tfCpf.setText(getCliente().getCpf());
+				tfNome.setText(getCliente().getNome());
+				tfEndereco.setText(getCliente().getEndereco());
+				tfEmail.setText(getCliente().getEmail());
+				dpAniversario.setValue(getCliente().getDataAniversario());
+				
+				//PREENCHER DADOS DA TABELA TELEFONE
+				tbTelefone.setItems(FXCollections.observableList(getCliente().getListaTelefone()));
 
 				// SELECIONANDO A PRIMEIRA ABA
 				tpAbas.getSelectionModel().select(0);
@@ -145,13 +182,13 @@ public class ClienteController extends Controller implements Initializable {
 	@FXML
 	void handleAlterar(ActionEvent event) {
 
-		cliente.setCpf(tfCpf.getText());
-		cliente.setNome(tfNome.getText());
-		cliente.setEndereco(tfEndereco.getText());
-		cliente.setEmail(tfEmail.getText());
-		cliente.setDataAniversario(dpAniversario.getValue());
+		getCliente().setCpf(tfCpf.getText());
+		getCliente().setNome(tfNome.getText());
+		getCliente().setEndereco(tfEndereco.getText());
+		getCliente().setEmail(tfEmail.getText());
+		getCliente().setDataAniversario(dpAniversario.getValue());
 
-		super.save(cliente);
+		super.save(getCliente());
 
 		handleLimpar(event);
 	}
@@ -167,7 +204,7 @@ public class ClienteController extends Controller implements Initializable {
 		// Capturar as resposta do usuÃ¡rio sobre a mensagem de confirmaÃ§Ã£o
 		Optional<ButtonType> resposta = alert.showAndWait();
 		if (resposta.get().equals(ButtonType.OK)) {
-			super.remove(cliente);
+			super.remove(getCliente());
 			handleLimpar(event);
 		} else if (resposta.get().equals(ButtonType.CANCEL)) {
 
@@ -176,10 +213,13 @@ public class ClienteController extends Controller implements Initializable {
 
 	@FXML
 	void handleIncluir(ActionEvent event) {
-		cliente = new Cliente(tfCpf.getText(), tfNome.getText(), tfEndereco.getText(), tfEmail.getText(),
-				dpAniversario.getValue());
+		getCliente().setCpf(tfCpf.getText());
+		getCliente().setNome(tfNome.getText());
+		getCliente().setEndereco(tfEndereco.getText());
+		getCliente().setEmail(tfEmail.getText());
+		getCliente().setDataAniversario(dpAniversario.getValue());
 
-		super.save(cliente);
+		super.save(getCliente());
 
 		handleLimpar(event);
 	}
@@ -193,7 +233,11 @@ public class ClienteController extends Controller implements Initializable {
 		dpAniversario.setValue(null);
 
 		// LIMPANDO AS INFORMAÃ‡Ã•ES DO CLIENTE
-		cliente = new Cliente();
+		cliente = null;
+		
+		//LIMPAR AS TABELAS
+		tvClientes.getItems().clear();
+		tbTelefone.getItems().clear();
 
 		tfNome.requestFocus();
 
@@ -201,8 +245,18 @@ public class ClienteController extends Controller implements Initializable {
 	}
 
 	private void atualizarBotoes() {
-		btIncluir.setDisable(cliente.getId() != null);
-		btAlterar.setDisable(cliente.getId() == null);
-		btExcluir.setDisable(cliente.getId() == null);
+		btIncluir.setDisable(getCliente().getId() != null);
+		btAlterar.setDisable(getCliente().getId() == null);
+		btExcluir.setDisable(getCliente().getId() == null);
+	}
+
+	public Cliente getCliente() {
+		if(cliente == null)
+			cliente = new Cliente();
+		return cliente;
+	}
+
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
 	}
 }

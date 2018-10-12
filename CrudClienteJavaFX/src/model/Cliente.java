@@ -19,7 +19,7 @@ public class Cliente extends DefaultEntity<Cliente>{
 	private String endereco;
 	private String email;
 	
-	@OneToMany(cascade=CascadeType.ALL)
+	@OneToMany(cascade=CascadeType.ALL, mappedBy="cliente")
 	private List<Telefone> listaTelefone;
 
 	@Column(columnDefinition="Date")
