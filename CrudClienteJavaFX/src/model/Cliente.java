@@ -7,6 +7,8 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 @Entity
@@ -19,6 +21,10 @@ public class Cliente extends DefaultEntity<Cliente>{
 	private String endereco;
 	private String email;
 	
+	@ManyToOne
+	@JoinColumn(name="idCidadeNatal")
+	private Cidade cidadNatal;
+
 	@OneToMany(cascade=CascadeType.ALL, mappedBy="cliente")
 	private List<Telefone> listaTelefone;
 
@@ -84,5 +90,13 @@ public class Cliente extends DefaultEntity<Cliente>{
 
 	public void setListaTelefone(List<Telefone> listaTelefone) {
 		this.listaTelefone = listaTelefone;
+	}
+	
+	public Cidade getCidadNatal() {
+		return cidadNatal;
+	}
+
+	public void setCidadNatal(Cidade cidadNatal) {
+		this.cidadNatal = cidadNatal;
 	}
 }

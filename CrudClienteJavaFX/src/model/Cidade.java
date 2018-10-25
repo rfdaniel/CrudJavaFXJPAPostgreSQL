@@ -1,5 +1,7 @@
 package model;
 
+import java.util.List;
+
 import javax.persistence.Entity;
 
 @Entity
@@ -10,6 +12,16 @@ public class Cidade extends DefaultEntity<Cidade>{
 	private String nomeCidade;
 	private String nomeEstado;
 	private String nomePais;
+	
+	public Cidade() {
+		
+	}
+	
+	public Cidade(String nomeCidade, String nomeEstado, String nomePais) {
+		this.nomeCidade = nomeCidade;
+		this.nomeEstado = nomeEstado;
+		this.nomePais = nomePais;
+	}
 	
 	public String getNomeCidade() {
 		return nomeCidade;
@@ -28,5 +40,8 @@ public class Cidade extends DefaultEntity<Cidade>{
 	}
 	public void setNomePais(String nomePais) {
 		this.nomePais = nomePais;
-	}
+	}	
+    public String toString() {
+        return this.getNomeCidade();
+    }
 }

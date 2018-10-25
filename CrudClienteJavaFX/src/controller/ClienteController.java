@@ -1,5 +1,6 @@
 package controller;
 
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -14,15 +15,20 @@ import javax.persistence.Query;
 
 import factory.JPAFactory;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
@@ -31,13 +37,20 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import model.Cidade;
 import model.Cliente;
 import model.Telefone;
+import repository.CidadeRepository;
 import repository.ClienteRepository;
 
 public class ClienteController extends Controller<Cliente> implements Initializable {
 
 	private Cliente cliente;
+	
+	private Cidade cidade;
 
 	@FXML
 	private TabPane tpAbas;
@@ -65,31 +78,34 @@ public class ClienteController extends Controller<Cliente> implements Initializa
 
 	@FXML
 	private TableColumn<Cliente, String> tcEnderecoCliente;
+	
+    @FXML
+    private ComboBox<Cidade> cbCidadeNatal;
 
 	@FXML
 	private TableColumn<Cliente, String> tcEmailCliente;
 
 	@FXML
 	private TableColumn<Cliente, LocalDate> dataAniversario;
-	
-    @FXML
-    private TextField tfDdd;
 
-    @FXML
-    private TextField tfNumeroTelefone;
+	@FXML
+	private TextField tfDdd;
 
-    @FXML
-    private Button btIncluirTelefone;
+	@FXML
+	private TextField tfNumeroTelefone;
 
-    @FXML
-    private TableView<Telefone> tbTelefone;
+	@FXML
+	private Button btIncluirTelefone;
 
-    @FXML
-    private TableColumn<Telefone, String> tcDdd;
+	@FXML
+	private TableView<Telefone> tbTelefone;
 
-    @FXML
-    private TableColumn<Telefone, String> tcTelefone;
-    
+	@FXML
+	private TableColumn<Telefone, String> tcDdd;
+
+	@FXML
+	private TableColumn<Telefone, String> tcTelefone;
+
 	@FXML
 	private TextField tfPesquisar;
 
@@ -105,33 +121,35 @@ public class ClienteController extends Controller<Cliente> implements Initializa
 		tcEnderecoCliente.setCellValueFactory(new PropertyValueFactory<>("endereco"));
 		tcEmailCliente.setCellValueFactory(new PropertyValueFactory<>("email"));
 		dataAniversario.setCellValueFactory(new PropertyValueFactory<>("dataAniversario"));
-		
+
 		// CONFIGURANDO AS COLUNAS DAS TABELAS CONFORME OS ATRIBUTOS DA CLASSE TELEFONE
 		tcDdd.setCellValueFactory(new PropertyValueFactory<>("codigoArea"));
 		tcTelefone.setCellValueFactory(new PropertyValueFactory<>("numero"));
-		
-		//ATUALIZAR BOTÕES
+
+		// ATUALIZAR BOTÕES
 		atualizarBotoes();
+		
+		carregarComboBox();
 	}
-	
-    @FXML
-    void handleAdicionarTelefone(ActionEvent event) {
-    	Telefone telefone = new Telefone();
-    	telefone.setCodigoArea(tfDdd.getText());
-    	telefone.setNumero(tfNumeroTelefone.getText());
-    	telefone.setCliente(cliente);
-    	
-    	if(getCliente().getListaTelefone() == null)
-    		getCliente().setListaTelefone(new ArrayList<Telefone>());
-    	
-    	getCliente().getListaTelefone().add(telefone);
-    	
-    	tbTelefone.setItems(FXCollections.observableList(getCliente().getListaTelefone()));
-    	
-    	tfDdd.clear();
-    	tfNumeroTelefone.clear();
-    	tfDdd.requestFocus();
-    }
+
+	@FXML
+	void handleAdicionarTelefone(ActionEvent event) {
+		Telefone telefone = new Telefone();
+		telefone.setCodigoArea(tfDdd.getText());
+		telefone.setNumero(tfNumeroTelefone.getText());
+		telefone.setCliente(cliente);
+
+		if (getCliente().getListaTelefone() == null)
+			getCliente().setListaTelefone(new ArrayList<Telefone>());
+
+		getCliente().getListaTelefone().add(telefone);
+
+		tbTelefone.setItems(FXCollections.observableList(getCliente().getListaTelefone()));
+
+		tfDdd.clear();
+		tfNumeroTelefone.clear();
+		tfDdd.requestFocus();
+	}
 
 	@FXML
 	void handlePesquisar(ActionEvent event) {
@@ -164,8 +182,8 @@ public class ClienteController extends Controller<Cliente> implements Initializa
 				tfEndereco.setText(getCliente().getEndereco());
 				tfEmail.setText(getCliente().getEmail());
 				dpAniversario.setValue(getCliente().getDataAniversario());
-				
-				//PREENCHER DADOS DA TABELA TELEFONE
+
+				// PREENCHER DADOS DA TABELA TELEFONE
 				tbTelefone.setItems(FXCollections.observableList(getCliente().getListaTelefone()));
 
 				// SELECIONANDO A PRIMEIRA ABA
@@ -218,6 +236,7 @@ public class ClienteController extends Controller<Cliente> implements Initializa
 		getCliente().setEndereco(tfEndereco.getText());
 		getCliente().setEmail(tfEmail.getText());
 		getCliente().setDataAniversario(dpAniversario.getValue());
+		getCliente().setCidadNatal(cbCidadeNatal.getValue());
 
 		super.save(getCliente());
 
@@ -234,8 +253,8 @@ public class ClienteController extends Controller<Cliente> implements Initializa
 
 		// LIMPANDO AS INFORMAÃ‡Ã•ES DO CLIENTE
 		cliente = null;
-		
-		//LIMPAR AS TABELAS
+
+		// LIMPAR AS TABELAS
 		tvClientes.getItems().clear();
 		tbTelefone.getItems().clear();
 
@@ -244,19 +263,51 @@ public class ClienteController extends Controller<Cliente> implements Initializa
 		atualizarBotoes();
 	}
 
+	@FXML
+	private void handleAbrirCadastroCidade(ActionEvent event) throws IOException {
+		FXMLLoader fXMLLoader = new FXMLLoader();
+		fXMLLoader.setLocation(getClass().getResource("/view/CadastroCidade.fxml"));
+		Stage stage = new Stage();
+		Scene scene = new Scene(fXMLLoader.load());
+		stage.setScene(scene);
+		stage.setResizable(false);
+		stage.initStyle(StageStyle.UNDECORATED);
+		stage.initModality(Modality.APPLICATION_MODAL);
+		stage.setTitle("Cidades");
+		stage.show();
+	}
+
 	private void atualizarBotoes() {
 		btIncluir.setDisable(getCliente().getId() != null);
 		btAlterar.setDisable(getCliente().getId() == null);
 		btExcluir.setDisable(getCliente().getId() == null);
 	}
-
+	
+	public void carregarComboBox() {
+		CidadeRepository repository = new CidadeRepository(JPAFactory.getEntityManager());
+		List<Cidade> lista = repository.getListNomesCidades();
+		
+		
+		cbCidadeNatal.setItems(FXCollections.observableList(lista));
+	}
+	
 	public Cliente getCliente() {
-		if(cliente == null)
+		if (cliente == null)
 			cliente = new Cliente();
 		return cliente;
 	}
 
 	public void setCliente(Cliente cliente) {
 		this.cliente = cliente;
+	}
+	
+	public Cidade getCidade() {
+		if (cidade == null)
+			cidade = new Cidade();
+		return cidade;
+	}
+
+	public void setCidade(Cidade cidade) {
+		this.cidade = cidade;
 	}
 }

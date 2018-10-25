@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import factory.JPAFactory;
+import model.Cidade;
 import model.Cliente;
 
 public class ClienteRepository extends Repository<Cliente> {
